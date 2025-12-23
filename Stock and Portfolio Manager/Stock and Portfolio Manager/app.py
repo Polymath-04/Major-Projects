@@ -1,72 +1,71 @@
-from flask import Flask, render_template, request, session, redirect, url_for
-from flask_session import Session
-import os
-from backend import authenticate, generate_unique_portfolios, generate_pie_chart
+from flask import Flask, render_template, request, redirect, url_for, session
+from backend import authenticate, generate_unique_portfolios
+import os, json
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-change-this'
-app.config['SESSION_TYPE'] = 'filesystem'
-Session(app)
+app.secret_key = 'supersecretkey'  # Must be set for sessions
 
-# Store users (in production, use a database)
-USERS = {}
+USERS_FILE = "users.json"
 
-@app.route('/')
-def index():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    return render_template('index.html')
+# Load users from file (or create if not present)
+def load_users():
+    if not os.path.exists(USERS_FILE):
+        with open(USERS_FILE, "w") as f:
+            json.dump({}, f)
+    with open(USERS_FILE, "r") as f:
+        return json.load(f)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        if username in USERS and USERS[username] == password:
-            session['user'] = username
-            return redirect(url_for('index'))
-        else:
-            return render_template('login.html', error='Invalid credentials')
-    
-    return render_template('login.html')
+def save_user(username, password):
+    users = load_users()
+    users[username] = password
+    with open(USERS_FILE, "w") as f:
+        json.dump(users, f)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
-        if username in USERS:
-            return render_template('register.html', error='User already exists')
-        
-        USERS[username] = password
+        users = load_users()
+        if username in users:
+            return render_template('register.html', error="Username already exists.")
+        save_user(username, password)
         session['user'] = username
-        return redirect(url_for('index'))
-    
+        return redirect('/')
     return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    users = load_users()
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username in users and users[username] == password:
+            session['user'] = username
+            return redirect('/')
+        return render_template('login.html', error="Invalid username or password.")
+    return render_template('login.html')
 
 @app.route('/logout')
 def logout():
-    session.clear()
-    return redirect(url_for('login'))
+    session.pop('user', None)
+    return redirect('/login')
+
+@app.route('/')
+def index():
+    if 'user' not in session:
+        return redirect('/login')
+    return render_template('index.html')
 
 @app.route('/results', methods=['POST'])
 def results():
     if 'user' not in session:
-        return redirect(url_for('login'))
-    
+        return redirect('/login')
     investment = float(request.form['investment'])
-    risk = request.form['risk']
-    goal = request.form['goal']
-    
-    token = session['user']
-    portfolios = generate_unique_portfolios(token, investment, risk, goal)
-    
-    for i, portfolio in enumerate(portfolios):
-        chart_filename = f'portfolio_{i+1}.png'
-        portfolio['chartfilename'] = chart_filename
-    
+    risk_level = request.form['risk']
+    time_goal = request.form['goal']
+    token = authenticate()
+    portfolios = generate_unique_portfolios(token, investment, risk_level, time_goal)
     return render_template('results.html', portfolios=portfolios)
 
 if __name__ == '__main__':
