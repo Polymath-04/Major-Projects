@@ -10,6 +10,10 @@
   - Assists New investors in creating best investment plans with customized risk and creates 4 to 5 user friedly & easy to understand portfolios.
   - Project Description - Stock and Portfolio Manager - Provides details and requirements for the stock and portfolio manager project.
 
+- **Data Analyst Job Market Analysis**
+  - Comprehensive analysis of Data Analyst job market in India examining salary trends, in-demand skills, and hiring patterns.
+  - Analyzed 1000+ job listings using SQL, Python, and Power BI to provide actionable insights for career development.
+
 
 
 
