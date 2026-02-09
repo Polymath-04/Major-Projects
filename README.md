@@ -10,7 +10,7 @@ This repository contains **3 major production-ready projects** showcasing real-w
 
 | Project | Category | Impact | Key Skills |
 |---------|----------|--------|------------|
-| **Walmart Sales Forecasting** | Time Series Analysis | 92% accuracy | ARIMA, Prophet, Python |
+| **Walmart Sales Forecasting** | Time Series Analysis | Inventory optimization  | ARIMA, Prophet, Python |
 | **Stock & Portfolio Manager** | Full-Stack Web App | 100+ portfolios tracked | Flask, APIs, Web Dev |
 | **ETL Data Pipeline** | Data Engineering | 80% automation gain | Python, ETL, Automation |
 
