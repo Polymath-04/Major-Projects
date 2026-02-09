@@ -9,7 +9,7 @@ Build a time series forecasting model to predict weekly sales across 45 Walmart 
 - **Features:** Store ID, weekly sales, promotional events, seasonality patterns
 
 ## Model Performance
-- **Forecast Accuracy:** 92% MAPE on test dataset
+- **Forecast Accuracy:** SARIMAX time series model for 12-week forecasts
 - **Business Impact:** Improved inventory optimization, reduced stockout costs by ~$50K annually
 - **Actionable Insights:** Identified seasonal patterns for specific store clusters
 
